@@ -1,6 +1,6 @@
-##OOP Concepts — Interview Style Answers (Senior Developer Level)
-##1. Abstraction
-##Interview Answer
+# OOP Concepts — Interview Style Answers (Senior Developer Level)
+# 1. Abstraction
+# Interview Answer
 
 Abstraction means hiding internal implementation details and exposing only essential behavior to the user.
 
@@ -8,7 +8,7 @@ In Java, abstraction is mainly achieved using abstract classes and interfaces.
 
 The idea is that consumers should focus on WHAT an object does rather than HOW it does it.
 
-##Real-World Example
+# Real-World Example
 
 For example, while driving a car, we use steering, brake, and accelerator, but we do not know the engine's internal implementation.
 
