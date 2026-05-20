@@ -1,4 +1,4 @@
-# OOP Concepts — Interview Style Answers (Senior Developer Level)
+## OOP Concepts — Interview Style Answers (Senior Developer Level)
 # 1. Abstraction
 # Interview Answer
 
@@ -11,7 +11,7 @@ The idea is that consumers should focus on WHAT an object does rather than HOW i
 # Real-World Example
 
 For example, while driving a car, we use steering, brake, and accelerator, but we do not know the engine's internal implementation.
-
+```
 interface PaymentService {
     void pay(double amount);
 }
@@ -23,3 +23,4 @@ class CreditCardPayment implements PaymentService {
         System.out.println("Payment via credit card");
     }
 }
+```
