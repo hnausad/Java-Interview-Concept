@@ -854,3 +854,867 @@ jstat -gc PID 1000
 ```bash
 jcmd PID VM.native_memory
 ```
+
+# Advanced JVM Topics for Senior Developers & Architects
+
+These are very important for:
+
+* Senior Java Developers
+* Tech Leads
+* Solution Architects
+* Production Support Engineers
+
+---
+
+# 1. JVM Tuning
+
+JVM tuning means optimizing JVM settings for:
+
+* Better performance
+* Lower memory usage
+* Faster response time
+* Reduced GC pauses
+* Higher throughput
+
+---
+
+# Why JVM Tuning is Needed?
+
+Default JVM settings may not be ideal for:
+
+* High traffic systems
+* Large heap applications
+* Microservices
+* Trading systems
+* Banking applications
+
+---
+
+# Main Areas of JVM Tuning
+
+| Area         | Purpose                 |
+| ------------ | ----------------------- |
+| Heap Size    | Optimize memory         |
+| GC Algorithm | Reduce pauses           |
+| Thread Stack | Prevent stack overflow  |
+| Metaspace    | Control class metadata  |
+| JIT Compiler | Improve execution speed |
+
+---
+
+# Important JVM Parameters
+
+---
+
+# Heap Size
+
+## Initial Heap
+
+```bash id="cgrgcd"
+-Xms2g
+```
+
+## Maximum Heap
+
+```bash id="4nysv0"
+-Xmx4g
+```
+
+---
+
+# Stack Size
+
+```bash id="ffjmy0"
+-Xss1m
+```
+
+---
+
+# Metaspace
+
+```bash id="v7g72g"
+-XX:MaxMetaspaceSize=512m
+```
+
+---
+
+# Example
+
+```bash id="rl4vc0"
+java -Xms2g -Xmx4g \
+     -XX:MaxMetaspaceSize=512m App
+```
+
+---
+
+# Tuning Goals
+
+---
+
+# Throughput
+
+Maximize application work.
+
+Used in:
+
+* Batch systems
+
+---
+
+# Low Latency
+
+Reduce pause times.
+
+Used in:
+
+* Trading systems
+* Real-time systems
+
+---
+
+# Memory Efficiency
+
+Reduce memory usage.
+
+Used in:
+
+* Containers
+* Microservices
+
+---
+
+# Common JVM Tuning Mistakes
+
+---
+
+# Huge Heap
+
+Large heap can increase:
+
+* Full GC pause
+
+---
+
+# Small Heap
+
+Too frequent GC.
+
+---
+
+# Wrong GC
+
+Using SerialGC in large application.
+
+---
+
+# 2. GC Tuning
+
+GC tuning means optimizing garbage collection.
+
+Goal:
+
+* Reduce pause time
+* Improve throughput
+* Prevent Full GC
+
+---
+
+# Key GC Concepts
+
+---
+
+# Minor GC
+
+Cleans Young Generation.
+
+Fast.
+
+---
+
+# Major GC
+
+Cleans Old Generation.
+
+Slow.
+
+---
+
+# Full GC
+
+Cleans entire heap.
+
+Very expensive.
+
+---
+
+# Important GC Algorithms
+
+| GC          | Best For          |
+| ----------- | ----------------- |
+| Serial GC   | Small apps        |
+| Parallel GC | High throughput   |
+| G1GC        | Balanced systems  |
+| ZGC         | Ultra low latency |
+| Shenandoah  | Low pause systems |
+
+---
+
+# G1GC
+
+Default modern GC.
+
+```bash id="1adrcq"
+-XX:+UseG1GC
+```
+
+Good for:
+
+* Large heaps
+* Microservices
+
+---
+
+# ZGC
+
+Ultra-low pause collector.
+
+```bash id="qzslbe"
+-XX:+UseZGC
+```
+
+Pause usually:
+
+```text id="b5h69n"
+< 10ms
+```
+
+---
+
+# Important GC Tuning Parameters
+
+---
+
+# Max Pause Goal
+
+```bash id="y5p1to"
+-XX:MaxGCPauseMillis=200
+```
+
+---
+
+# Heap Occupancy
+
+```bash id="r8zvqo"
+-XX:InitiatingHeapOccupancyPercent=45
+```
+
+---
+
+# GC Threads
+
+```bash id="m57b1j"
+-XX:ParallelGCThreads=8
+```
+
+---
+
+# GC Tuning Example
+
+```bash id="w8e3yj"
+java -Xms4g -Xmx4g \
+     -XX:+UseG1GC \
+     -XX:MaxGCPauseMillis=100
+```
+
+---
+
+# 3. Thread Dump Analysis
+
+Thread dump shows:
+
+* All JVM threads
+* Their states
+* Stack traces
+
+Used for:
+
+* Deadlock analysis
+* Performance issues
+* High CPU debugging
+
+---
+
+# Generate Thread Dump
+
+```bash id="ohsyc4"
+jstack PID
+```
+
+---
+
+# Thread States
+
+| State         | Meaning              |
+| ------------- | -------------------- |
+| RUNNABLE      | Executing            |
+| BLOCKED       | Waiting for lock     |
+| WAITING       | Waiting indefinitely |
+| TIMED_WAITING | Sleeping/waiting     |
+| TERMINATED    | Finished             |
+
+---
+
+# Example Deadlock
+
+```java id="jtzkvg"
+Thread1 locks A → waits B
+Thread2 locks B → waits A
+```
+
+Thread dump shows:
+
+```text id="y4njlwm"
+Found one Java-level deadlock
+```
+
+---
+
+# Important Things to Analyze
+
+---
+
+# BLOCKED Threads
+
+Indicates lock contention.
+
+---
+
+# High CPU Threads
+
+Usually infinite loops.
+
+---
+
+# Deadlocks
+
+Two threads waiting forever.
+
+---
+
+# Waiting Threads
+
+May indicate external dependency issues.
+
+---
+
+# Tools
+
+* jstack
+* VisualVM
+* JConsole
+* FastThread
+
+---
+
+# 4. Heap Dump Analysis
+
+Heap dump = memory snapshot of JVM.
+
+Used to analyze:
+
+* Memory leaks
+* Large objects
+* OOM issues
+
+---
+
+# Generate Heap Dump
+
+```bash id="r77kpd"
+jmap -dump:live,file=heap.hprof PID
+```
+
+---
+
+# Analyze Using
+
+* Eclipse MAT
+* VisualVM
+* JProfiler
+
+---
+
+# Important Things to Analyze
+
+---
+
+# Dominator Tree
+
+Finds biggest memory consumers.
+
+---
+
+# Retained Heap
+
+Memory retained by object.
+
+---
+
+# Leak Suspects
+
+Possible memory leaks.
+
+---
+
+# Example Leak
+
+```java id="j6r5yf"
+static List cache = new ArrayList();
+```
+
+Objects never removed.
+
+---
+
+# Common Leak Sources
+
+* Static collections
+* Cache misuse
+* ThreadLocal misuse
+* Unclosed sessions
+* ClassLoader leaks
+
+---
+
+# 5. ClassLoader Leaks
+
+One of the most advanced JVM problems.
+
+---
+
+# What is a ClassLoader Leak?
+
+Classes cannot unload because:
+
+* ClassLoader still referenced
+
+Result:
+
+* Metaspace grows forever
+
+---
+
+# Common in
+
+* Apache Tomcat
+* JBoss
+* Hot deployments
+* Plugin systems
+
+---
+
+# Example
+
+```java id="dbs26x"
+static Object obj;
+```
+
+If object references application class:
+
+* Old ClassLoader cannot unload
+
+---
+
+# Symptoms
+
+* Increasing Metaspace
+* Full GC frequency
+* `OutOfMemoryError: Metaspace`
+
+---
+
+# Detection Tools
+
+* MAT
+* JProfiler
+* VisualVM
+
+---
+
+# 6. Memory Optimization
+
+Goal:
+
+* Reduce memory consumption
+* Improve GC performance
+
+---
+
+# Techniques
+
+---
+
+# Use Primitive Types
+
+Bad:
+
+```java id="4xg2ym"
+Integer x = 10;
+```
+
+Better:
+
+```java id="ggxowf"
+int x = 10;
+```
+
+---
+
+# Avoid Unnecessary Objects
+
+Bad:
+
+```java id="w16i7l"
+new String("Java");
+```
+
+---
+
+# Reuse Objects
+
+Object pooling.
+
+---
+
+# Use Efficient Collections
+
+Example:
+
+* ArrayList vs LinkedList
+* EnumMap
+* ConcurrentHashMap
+
+---
+
+# Reduce Object Creation
+
+Especially inside loops.
+
+---
+
+# Use StringBuilder
+
+Bad:
+
+```java id="8u6pg8"
+str += value;
+```
+
+Good:
+
+```java id="0gbs3q"
+StringBuilder
+```
+
+---
+
+# 7. GC Logs
+
+GC logs show:
+
+* GC activity
+* Pause times
+* Memory usage
+
+Very important in production debugging.
+
+---
+
+# Enable GC Logs
+
+Modern JVM:
+
+```bash id="jlwmrt"
+-Xlog:gc*
+```
+
+---
+
+# Old JVM
+
+```bash id="nryjv7"
+-XX:+PrintGCDetails
+```
+
+---
+
+# Example Log
+
+```text id="2ikjlwm"
+Pause Young (G1 Evacuation Pause)
+```
+
+---
+
+# Important Metrics
+
+| Metric            | Meaning                   |
+| ----------------- | ------------------------- |
+| Pause Time        | Application stop duration |
+| GC Frequency      | How often GC runs         |
+| Heap Before/After | Memory reclaimed          |
+| Full GC Count     | Expensive GC events       |
+
+---
+
+# GC Analysis Tools
+
+* GCViewer
+* GCeasy
+* JClarity Censum
+
+---
+
+# 8. JIT Optimizations
+
+JIT = Just In Time Compiler
+
+Converts hot bytecode into machine code.
+
+---
+
+# Why Needed?
+
+Interpreter is slower.
+
+JIT improves:
+
+* CPU performance
+* Execution speed
+
+---
+
+# JIT Optimizations
+
+---
+
+# Method Inlining
+
+```java id="qbx2vv"
+add(a,b)
+```
+
+Method body inserted directly.
+
+---
+
+# Dead Code Elimination
+
+Unused code removed.
+
+---
+
+# Loop Optimization
+
+Loops optimized.
+
+---
+
+# Escape Analysis
+
+If object doesn't escape:
+
+* Allocate on stack
+
+---
+
+# Lock Elimination
+
+Remove unnecessary synchronization.
+
+---
+
+# Example
+
+```java id="fgjlwm"
+StringBuilder sb = new StringBuilder();
+```
+
+JVM may optimize allocation.
+
+---
+
+# JIT Monitoring
+
+```bash id="gpyjq0"
+-XX:+PrintCompilation
+```
+
+---
+
+# 9. Production Debugging
+
+Most important real-world skill.
+
+---
+
+# Common Production Problems
+
+| Problem        | Symptoms            |
+| -------------- | ------------------- |
+| High CPU       | Slow system         |
+| Memory Leak    | Increasing heap     |
+| Deadlock       | Hanging threads     |
+| GC Issue       | Long pauses         |
+| Metaspace Leak | Class loading issue |
+
+---
+
+# Production Debugging Flow
+
+---
+
+# Step 1: Check CPU
+
+Linux:
+
+```bash id="egitj9"
+top -H -p PID
+```
+
+---
+
+# Step 2: Capture Thread Dump
+
+```bash id="ypldcn"
+jstack PID
+```
+
+---
+
+# Step 3: Analyze GC
+
+Check:
+
+* GC logs
+* Full GC frequency
+
+---
+
+# Step 4: Capture Heap Dump
+
+```bash id="ccqkq9"
+jmap -dump:live,file=heap.hprof PID
+```
+
+---
+
+# Step 5: Analyze Memory
+
+Using:
+
+* MAT
+* VisualVM
+
+---
+
+# Real Production Scenario
+
+---
+
+# Problem
+
+Application slow every few minutes.
+
+---
+
+# Investigation
+
+## GC Logs
+
+Show:
+
+```text id="4ljlwm"
+Full GC every 2 minutes
+```
+
+---
+
+## Heap Dump
+
+Found:
+
+```java id="prp0aa"
+Map<String,Object> cache
+```
+
+Growing infinitely.
+
+---
+
+# Fix
+
+* Add cache eviction
+* Reduce heap pressure
+
+---
+
+# Essential JVM Monitoring Tools
+
+| Tool      | Usage                |
+| --------- | -------------------- |
+| jstack    | Thread dump          |
+| jmap      | Heap dump            |
+| jcmd      | JVM diagnostics      |
+| jstat     | GC stats             |
+| VisualVM  | Monitoring           |
+| MAT       | Heap analysis        |
+| JProfiler | Profiling            |
+| YourKit   | Performance analysis |
+
+---
+
+# Important Senior-Level Interview Topics
+
+Most asked:
+
+* G1GC tuning
+* ZGC vs G1GC
+* Heap dump analysis
+* Deadlock debugging
+* GC log analysis
+* Metaspace leaks
+* JVM flags
+* Thread dump analysis
+* Production issue debugging
+* High CPU troubleshooting
+
+---
+
+# Real-World JVM Tuning Example
+
+```bash id="jlwmrt"
+java \
+-Xms4g \
+-Xmx4g \
+-XX:+UseG1GC \
+-XX:MaxGCPauseMillis=100 \
+-XX:+HeapDumpOnOutOfMemoryError \
+-Xlog:gc* \
+jar app.jar
+```
+
+---
+
+# One-Line Definitions
+
+| Topic                | Definition                       |
+| -------------------- | -------------------------------- |
+| JVM Tuning           | Optimizing JVM configuration     |
+| GC Tuning            | Optimizing garbage collection    |
+| Thread Dump          | Snapshot of JVM threads          |
+| Heap Dump            | Snapshot of heap memory          |
+| ClassLoader Leak     | Unreleased class metadata        |
+| GC Logs              | Garbage collection activity logs |
+| JIT Optimization     | Runtime code optimization        |
+| Production Debugging | Diagnosing live system issues    |
