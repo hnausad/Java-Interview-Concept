@@ -275,12 +275,13 @@ public class ExtendedBankingFactoryDemo {
     }
 }
 
-In production banking applications, workflows are typically managed by loading configurations or iterating through a collection of tasks. We can store all the engines inside a standard Java List or Map and use a loop to process them sequentially.
+/**In production banking applications, workflows are typically managed by loading configurations or iterating through a collection of *tasks. We can store all the engines inside a standard Java List or Map and use a loop to process them sequentially.
 
-Here are two professional ways to rewrite your execution layer depending on your project needs.
+*Here are two professional ways to rewrite your execution layer depending on your project needs.
 
-Option 1: Using a List for Sequential Processing (Cleanest Code)
-If your goal is to cleanly cycle through every single branch engine and execute them one by one, you can stream them or use an enhanced for loop.
+*Option 1: Using a List for Sequential Processing (Cleanest Code)
+*If your goal is to cleanly cycle through every single branch engine and execute them one by one, you can stream them or use an enhanced *for loop.
+*/
 
 import java.util.List;
 import java.util.Arrays;
@@ -304,9 +305,9 @@ public class ExtendedBankingFactoryDemo {
     }
 }
 
-Option 2: Using a Map for Dynamic Lookup (Enterprise Standard)
-In real banking applications, you rarely hardcode which branch executes manually. Instead, an incoming API request sends a string identifier (like "LOAN" or "SALARY"), and your system must pull the correct factory on the fly.
-
+/**Option 2: Using a Map for Dynamic Lookup (Enterprise Standard)
+*In real banking applications, you rarely hardcode which branch executes manually. Instead, an incoming API request sends a string *identifier (like "LOAN" or "SALARY"), and your system must pull the correct factory on the fly.
+*/
 Using a Map allows you to look up and execute the exact engine dynamically:
 
 import java.util.HashMap;
