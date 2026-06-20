@@ -8,7 +8,7 @@ These 23 patterns are strictly organized into three core pillars:
 
 These focus on how objects are created, ensuring the system doesn't become tightly coupled to how its components are instantiated.
 
-* **Singleton:** Ensures a class has only one global instance.
+* **Singleton:** Ensures a class has only one global instance.[https://github.com/hnausad/Java-Interview-Concept/blob/java-design-pattern/singleton-design-pattern.md]
 * **Factory Method:** Creates objects without specifying the exact class to be created.
 * **Abstract Factory:** Creates families of related objects without specifying their concrete classes.
 * **Builder:** Constructs complex objects step-by-step.
