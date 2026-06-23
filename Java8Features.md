@@ -731,8 +731,7 @@ These operations gather stream elements and package them into standard Java Coll
 Explanation: Accumulates all employee objects into a standard java.util.List. It preserves the encounter order.
 
 Code:
-```
-Java
+```Java
 
 
 List<Employee> employeeList = employees.stream()
@@ -746,8 +745,7 @@ System.out.println(employeeList);
 Explanation: Extracts elements into a java.util.Set. It automatically eliminates duplicate values based on the object's equivalence identity. Here, we extract unique department names.
 
 Code:
-```
-Java
+```Java
 
 
 Set<String> uniqueDepartments = employees.stream()
@@ -761,8 +759,7 @@ System.out.println(uniqueDepartments);
 Explanation: Used when you require a specific, concrete implementation of a Collection (e.g., LinkedList, TreeSet) rather than the default choices made by toList() or toSet().
 
 Code:
-```
-Java
+```Java
 
 
 LinkedHashSet<String> sortedNamesByOrder = employees.stream()
@@ -773,8 +770,7 @@ LinkedHashSet<String> sortedNamesByOrder = employees.stream()
 Explanation: Converts the stream into a Key-Value Map. Because we have two employees named "Alice", we must provide the 3rd argument (the Merge Function) to define how to handle the key collision.
 
 Code:
-```
-Java
+```Java
 
 
 Map<String, Integer> nameToSalaryMap = employees.stream()
@@ -791,8 +787,7 @@ System.out.println(nameToSalaryMap);
 Explanation: Operates identically to toMap, but forces the stream engine to accumulate data into a thread-safe, concurrent ConcurrentHashMap. Highly performant for parallel pipelines.
 
 Code:
-```
-Java
+```Java
 
 
 ConcurrentMap<String, String> concurrentMap = employees.parallelStream()
@@ -809,8 +804,7 @@ These collectors look inside your objects, parse their numeric primitive structu
 Explanation: Counts the total number of items passing through to this terminal phase.
 
 Code:
-```
-Java
+```Java
 
 
 Long totalEngineers = employees.stream()
@@ -823,8 +817,7 @@ System.out.println(totalEngineers); // Output: 3
 Explanation: Maps an item to an integer value and calculates the total mathematical sum of all matching records.
 
 Code:
-```
-Java
+```Java
 
 
 Integer totalSalaryBudget = employees.stream()
@@ -836,8 +829,7 @@ System.out.println(totalSalaryBudget); // Output: 605000
 Explanation: Calculates the arithmetic mean value of the specified numeric attribute.
 
 Code:
-```
-Java
+```Java
 
 
 Double averageSalary = employees.stream()
@@ -849,8 +841,7 @@ System.out.println(averageSalary); // Output: 86428.57
 Explanation: Locates the boundary elements (absolute minimum or maximum) based on a sorting rule, safely wrapped in an Optional.
 
 Code:
-```
-Java
+```Java
 
 
 Optional<Employee> highestPaid = employees.stream()
@@ -862,8 +853,7 @@ System.out.println(highestPaid.get()); // Output: Frank (Engineering, $130000, C
 Explanation: A multi-tool method that sweeps through the dataset once and returns a single state container object containing count, sum, min, average, and max values combined.
 
 Code:
-```
-Java
+```Java
 
 
 IntSummaryStatistics salaryStats = employees.stream()
@@ -879,8 +869,7 @@ This group focuses entirely on turning individual text properties into a single 
 Explanation: Concatenates string elements. It can be called with no arguments, with just a delimiter, or with a delimiter combined with custom wrapping prefixes and suffixes.
 
 Code:
-```
-Java
+```Java
 
 
 String employeeNamesCVS = employees.stream()
@@ -898,8 +887,7 @@ These functions organize your unstructured flat collections into highly organize
 Explanation: Organizes records into buckets based on a shared property. Adding a secondary Downstream Collector allows you to perform an aggregation (like counting or summing) inside each grouped bucket.
 
 Code:
-```
-Java
+```Java
 
 
 // Grouping employees by department, and calculating the total salary budget for each department
@@ -916,8 +904,7 @@ System.out.println(deptBudgetReport);
 Explanation: A specialized variant of grouping that splits data into exactly two categories (true and false) based on a boolean check.
 
 Code:
-```
-Java
+```Java
 
 
 // Partitioning employees into highly paid (>$100k) vs others, and listing their names
@@ -937,8 +924,7 @@ These collectors are used to modify, adapt, or chain other collectors together.
 Explanation: Performs an immutable reduction calculation. While you would typically use stream.reduce() directly on a stream, Collectors.reducing() is useful as a nested downstream collector inside a groupingBy operation.
 
 Code:
-```
-Java
+```Java
 
 
 // Finding the highest salary within each department using a nested reducing block
@@ -952,8 +938,7 @@ Map<String, Optional<Employee>> richestByDept = employees.stream()
 Explanation: Applies a structural transformation to elements before passing them to a downstream collector. This allows you to collect specific fields rather than full object compositions.
 
 Code:
-```
-Java
+```Java
 
 
 // Grouping by city, but collecting only employee names into a set instead of full employee objects
@@ -970,8 +955,7 @@ System.out.println(namesByCity);
 Explanation: Executes a collection step normally, and then immediately runs a Finisher Function to transform the result before returning it. A common use case is making a collected container unmodifiable.
 
 Code:
-```
-Java
+```Java
 
 
 // Collect elements into a list, then immediately convert it into an unmodifiable List
