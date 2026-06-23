@@ -683,8 +683,7 @@ To thoroughly demonstrate every single Collectors method, we will use a realisti
 Here is our dummy dataset, which contains duplicates, varying salaries, different departments, and null values to simulate real-world production data.
 
 # The Domain Model & Dummy Data
-```
-Java
+```Java
 
 
 public class Employee {
@@ -710,7 +709,8 @@ public class Employee {
     public String toString() {
         return String.format("%s (%s, $%d, %s)", name, department, salary, city);
     }
-}```
+}
+```
 ```Java
 
 
@@ -723,11 +723,12 @@ List<Employee> employees = Arrays.asList(
     new Employee("Frank", "Engineering", 130000, "Chicago"),
     // Duplicate entry name to test duplicate map keys and unique sets
     new Employee("Alice", "Marketing", 100000, "Miami")
-);``
-* Group A: Collecting to Target Data Structures
+);
+```
+# Group A: Collecting to Target Data Structures
 These operations gather stream elements and package them into standard Java Collection Framework containers.
 
-* 1. toList()
+1. toList()
 Explanation: Accumulates all employee objects into a standard java.util.List. It preserves the encounter order.
 
 Code:
