@@ -235,6 +235,8 @@ public class CustomReadWriteLock {
 
 6. Thread Synchronizers: CountDownLatch vs. CyclicBarrier
    |Feature	|CountDownLatch|CyclicBarrier|
+   |---------|:--------------:|:-----------------:|
+
    |Reuse	|Cannot be reset. One-time use.|Can be reset and reused after threads break through.|
    |Mechanism|Waiting threads block until counter reaches 0 via countDown().|Threads wait for each other at a barrier point via await().|
    |Focus    |One or more threads wait for N events.                         |N threads wait for each other to coordinate.|
