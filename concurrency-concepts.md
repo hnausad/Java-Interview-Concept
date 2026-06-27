@@ -53,5 +53,64 @@ public class CustomAtomicInteger {
         return next;
     }
 }
+
 ```
+
 An identical structural pattern applies to custom AtomicLong (using long) and AtomicBoolean (mapping booleans to 1/0 or conditional CAS).
+
+# 3. Semaphores & The Producer-Consumer Pattern
+A Semaphore maintains a set of permits. Threads block if no permits are available.
+
+## Custom Semaphore Implementation
+java```
+public class CustomSemaphore {
+    private int permits;
+
+    public CustomSemaphore(int permits) {
+        this.permits = permits;
+    }
+
+    public synchronized void acquire() throws InterruptedException {
+        while (permits <= 0) {
+            wait();
+        }
+        permits--;
+    }
+
+    public synchronized void release() {
+        permits++;
+        notifyAll();
+    }
+}
+```
+### Producer-Consumer Pattern using Custom Semaphore
+By tracking empty spaces and available items via two complementary semaphores, you avoid race conditions entirely.
+java```
+public class SemaphoreProducerConsumer {
+    private static final int CAPACITY = 5;
+    private final Queue<Integer> buffer = new LinkedList<>();
+    
+    private final CustomSemaphore empty = new CustomSemaphore(CAPACITY);
+    private final CustomSemaphore full = new CustomSemaphore(0);
+    private final Object mutex = new Object(); // For safe queue modification
+
+    public void produce(int item) throws InterruptedException {
+        empty.acquire(); // Decrements empty slots
+        synchronized (mutex) {
+            buffer.add(item);
+        }
+        full.release(); // Increments available items
+    }
+
+    public int consume() throws InterruptedException {
+        full.acquire(); // Decrements available items
+        int item;
+        synchronized (mutex) {
+            item = buffer.poll();
+        }
+        empty.release(); // Increments empty slots
+        return item;
+    }
+}
+```
+
