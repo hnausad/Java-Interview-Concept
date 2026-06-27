@@ -114,3 +114,154 @@ public class SemaphoreProducerConsumer {
 }
 ```
 
+# 4. Locks & ReentrantLock
+A ReentrantLock allows a thread to re-acquire a lock it already holds without deadlocking itself.
+
+Difference between synchronized and ReentrantLock
+synchronized is implicit and block-scoped. ReentrantLock allows manual `.lock()` and `.unlock()` across different methods.
+
+ReentrantLock provides advanced features: fairness policies, lock polling `(tryLock())`, and interrupted lock waiting.
+
+### Custom `ReentrantLock` Implementation
+```java
+public class CustomReentrantLock {
+    private boolean isLocked = false;
+    private Thread lockingThread = null;
+    private int lockCount = 0;
+
+    public synchronized void lock() throws InterruptedException {
+        Thread callingThread = Thread.currentThread();
+        while (isLocked && lockingThread != callingThread) {
+            wait();
+        }
+        isLocked = true;
+        lockCount++;
+        lockingThread = callingThread;
+    }
+
+    public synchronized void unlock() {
+        if (Thread.currentThread() == this.lockingThread) {
+            lockCount--;
+            if (lockCount == 0) {
+                isLocked = false;
+                lockingThread = null;
+                notify();
+            }
+        }
+    }
+}
+
+```
+Solving Producer-Consumer via newCondition()
+Condition variables decouple thread signaling into unique wait sets per lock instance.
+
+```java
+public class ConditionProducerConsumer {
+    private final ReentrantLock lock = new ReentrantLock();
+    private final Condition notFull = lock.newCondition();
+    private final Condition notEmpty = lock.newCondition();
+    private final Queue<Integer> queue = new LinkedList<>();
+    private final int capacity = 10;
+
+    public void produce(int val) throws InterruptedException {
+        lock.lock();
+        try {
+            while (queue.size() == capacity) {
+                notFull.await(); // Wait until there's space
+            }
+            queue.add(val);
+            notEmpty.signalAll(); // Signal consumers
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public int consume() throws InterruptedException {
+        lock.lock();
+        try {
+            while (queue.isEmpty()) {
+                notEmpty.await(); // Wait until there's data
+            }
+            int val = queue.poll();
+            notFull.signalAll(); // Signal producers
+            return val;
+        } finally {
+            lock.unlock();
+        }
+    }
+}
+```
+
+### Applications of `ReentrantLock`
+High-concurrency data structures where starvation must be controlled via fair locking.
+
+Algorithms needing non-blocking lock acquisition (tryLock()) to prevent immediate thread stall.
+
+Implementing complex, nested multi-resource locking patterns.
+```java
+public class CustomReadWriteLock {
+    private int readers = 0;
+    private int writers = 0;
+    private int writeRequests = 0;
+
+    public synchronized void lockRead() throws InterruptedException {
+        while (writers > 0 || writeRequests > 0) {
+            wait();
+        }
+        readers++;
+    }
+
+    public synchronized void unlockRead() {
+        readers--;
+        notifyAll();
+    }
+
+    public synchronized void lockWrite() throws InterruptedException {
+        writeRequests++;
+        while (readers > 0 || writers > 0) {
+            wait();
+        }
+        writeRequests--;
+        writers++;
+    }
+
+    public synchronized void unlockWrite() {
+        writers--;
+        notifyAll();
+    }
+}
+
+```
+
+6. Thread Synchronizers: CountDownLatch vs. CyclicBarrier
+   ### Feature	CountDownLatch	                                                CyclicBarrier
+       Reuse	Cannot be reset. One-time use.	                                Can be reset and reused after threads break through.
+   Mechanism	Waiting threads block until counter reaches 0 via countDown().	Threads wait for each other at a barrier point via await().
+   Focus        One or more threads wait for N events.                          N threads wait for each other to coordinate.
+
+### Custom CountDownLatch Implementation
+```java
+public class CustomCountDownLatch {
+    private int count;
+
+    public CustomCountDownLatch(int count) {
+        this.count = count;
+    }
+
+    public synchronized void await() throws InterruptedException {
+        while (count > 0) {
+            wait();
+        }
+    }
+
+    public synchronized void countDown() {
+        if (count > 0) {
+            count--;
+            if (count == 0) {
+                notifyAll();
+            }
+        }
+    }
+}
+
+```
