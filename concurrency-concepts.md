@@ -233,7 +233,7 @@ public class CustomReadWriteLock {
 
 ```
 
-6. Thread Synchronizers: CountDownLatch vs. CyclicBarrier
+## 6. Thread Synchronizers: CountDownLatch vs. CyclicBarrier
    | Feature	| CountDownLatch| CyclicBarrier|
    |---------|:--------------:|:-----------------:|
    | Reuse	| Cannot be reset. One-time use.| Can be reset and reused after threads break through.|
@@ -265,4 +265,119 @@ public class CustomCountDownLatch {
     }
 }
 
+```
+### Custom CyclicBarrier Implementation
+```java
+public class CustomCyclicBarrier {
+    private final int parties;
+    private int count;
+    private int generation = 0;
+
+    public CustomCyclicBarrier(int parties) {
+        this.parties = parties;
+        this.count = parties;
+    }
+
+    public synchronized void await() throws InterruptedException {
+        int currentGeneration = generation;
+        count--;
+        
+        if (count == 0) {
+            // Last thread arrived: Reset for reuse and wake everyone
+            generation++;
+            count = parties;
+            notifyAll();
+        } else {
+            // Wait until the current generation changes
+            while (currentGeneration == generation) {
+                wait();
+            }
+        }
+    }
+}
+
+```
+# 7. Advanced Synchronizers: Phaser & Exchanger
+`Phaser`
+A more flexible, dynamic alternative to `CyclicBarrier` and `CountDownLatch`. Unlike a barrier, the number of registered parties in a `Phaser` can vary dynamically over time.
+
+Parent-Child Phaser: Used to form a hierarchy to eliminate synchronization contention on a single phaser across massive numbers of threads.
+```java
+Phaser parent = new Phaser(1); // Master coordinator
+Phaser child1 = new Phaser(parent); // Registers child to parent
+Phaser child2 = new Phaser(parent);
+
+// Threads can register to specific child phasers to run sub-tasks in tiers
+```
+
+`Exchanger`
+A synchronization point where two threads can pair up and swap elements non-blockingly. Thread A calls exchange(dataA) and blocks until Thread B calls exchange(dataB), returning the swapped objects instantly.
+
+# 8. BlockingQueue Architecture & Custom Implementation
+A queue that blocks when you attempt to take elements from an empty queue, or put elements into a full one.
+
+### Custom LinkedBlockingQueue Implementation
+
+```java
+public class CustomLinkedBlockingQueue<E> {
+    private final int capacity;
+    private final LinkedList<E> list = new LinkedList<>();
+
+    public CustomLinkedBlockingQueue(int capacity) {
+        this.capacity = capacity;
+    }
+
+    public synchronized void put(E element) throws InterruptedException {
+        while (list.size() == capacity) {
+            wait();
+        }
+        list.addLast(element);
+        notifyAll(); // Wake up any waiting consumers
+    }
+
+    public synchronized E take() throws InterruptedException {
+        while (list.isEmpty()) {
+            wait();
+        }
+        E element = list.removeFirst();
+        notifyAll(); // Wake up any waiting producers
+        return element;
+    }
+}
+```
+
+### Implementing a `ThreadPool` Using Custom `LinkedBlockingQueue`
+By utilizing our blocking queue, we can create a minimalist functional ThreadPool manually:
+```java
+public class CustomThreadPool {
+    private final CustomLinkedBlockingQueue<Runnable> taskQueue;
+    private final ThreadWorker[] workers;
+
+    public CustomThreadPool(int numThreads, int maxTasks) {
+        taskQueue = new CustomLinkedBlockingQueue<>(maxTasks);
+        workers = new ThreadWorker[numThreads];
+
+        for (int i = 0; i < numThreads; i++) {
+            workers[i] = new ThreadWorker();
+            workers[i].start();
+        }
+    }
+
+    public void execute(Runnable task) throws InterruptedException {
+        taskQueue.put(task);
+    }
+
+    private class ThreadWorker extends Thread {
+        public void run() {
+            while (true) {
+                try {
+                    Runnable task = taskQueue.take(); // Blocks automatically if empty
+                    task.run();
+                } catch (InterruptedException e) {
+                    break; 
+                }
+            }
+        }
+    }
+}
 ```
