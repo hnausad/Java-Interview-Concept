@@ -20,10 +20,10 @@ Callable: Its method call() returns a value of type T and can throw checked exce
 # 2. Atomic Operations & Custom Implementations
 Atomic operations are non-blocking, lock-free operations that leverage low-level CPU hardware instructions like CAS (Compare-And-Swap).
 
-## Custom AtomicInteger Implementation
+## Custom `AtomicInteger` Implementation
 Standard implementations use sun.misc.Unsafe or VarHandle to access memory directly. We can mock a custom version using a 
 loop and a synchronized CAS simulation to see how it works conceptually under the hood:
-java```
+```java
 public class CustomAtomicInteger {
     private volatile int value;
 
@@ -61,8 +61,8 @@ An identical structural pattern applies to custom AtomicLong (using long) and At
 # 3. Semaphores & The Producer-Consumer Pattern
 A Semaphore maintains a set of permits. Threads block if no permits are available.
 
-## Custom Semaphore Implementation
-java```
+### Custom Semaphore Implementation
+```java
 public class CustomSemaphore {
     private int permits;
 
@@ -85,7 +85,7 @@ public class CustomSemaphore {
 ```
 ### Producer-Consumer Pattern using Custom Semaphore
 By tracking empty spaces and available items via two complementary semaphores, you avoid race conditions entirely.
-java```
+```java
 public class SemaphoreProducerConsumer {
     private static final int CAPACITY = 5;
     private final Queue<Integer> buffer = new LinkedList<>();
