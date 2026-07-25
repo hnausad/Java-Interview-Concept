@@ -14,6 +14,15 @@ These focus on how objects are created, ensuring the system doesn't become tight
 * **Factory Method:** Creates objects without specifying the exact class to be created.
 * **Abstract Factory:** Creates families of related objects without specifying their concrete classes.
 * **Builder:** Constructs complex objects step-by-step.
+* Constructors become hard to read and maintain when there are many parameters, especially optional ones. The Builder Pattern makes object creation more readable, flexible, and less error-prone by allowing step-by-step construction through method chaining. It also supports immutable objects and avoids the telescoping constructor problem.
+* Why use the Builder Pattern?
+
+ **Use it when:**
+ 
+ An object has many optional parameters.
+ Object creation involves multiple steps.
+ You want to create immutable objects.
+ You want to avoid constructors with too many parameters (known as the telescoping constructor problem).
 * **Prototype:** Creates new objects by copying/cloning an existing instance.
 
 ### 2. Structural Patterns (7 Patterns)
